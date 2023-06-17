@@ -8,6 +8,7 @@ package user_query
 
 import (
 	context "context"
+	user_domain "github.com/wuyazi/grpc_user_domain/user_domain"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -22,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserQueryClient interface {
-	//    rpc insertUser(user_domain.UserCreated) returns(userResp);
+	InsertUser(ctx context.Context, in *user_domain.UserCreated, opts ...grpc.CallOption) (*UserResp, error)
 	GetByUserId(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error)
 }
 
@@ -32,6 +33,15 @@ type userQueryClient struct {
 
 func NewUserQueryClient(cc grpc.ClientConnInterface) UserQueryClient {
 	return &userQueryClient{cc}
+}
+
+func (c *userQueryClient) InsertUser(ctx context.Context, in *user_domain.UserCreated, opts ...grpc.CallOption) (*UserResp, error) {
+	out := new(UserResp)
+	err := c.cc.Invoke(ctx, "/user_query.userQuery/insertUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *userQueryClient) GetByUserId(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error) {
@@ -47,7 +57,7 @@ func (c *userQueryClient) GetByUserId(ctx context.Context, in *GetByUserIdReq, o
 // All implementations must embed UnimplementedUserQueryServer
 // for forward compatibility
 type UserQueryServer interface {
-	//    rpc insertUser(user_domain.UserCreated) returns(userResp);
+	InsertUser(context.Context, *user_domain.UserCreated) (*UserResp, error)
 	GetByUserId(context.Context, *GetByUserIdReq) (*UserResp, error)
 	mustEmbedUnimplementedUserQueryServer()
 }
@@ -56,6 +66,9 @@ type UserQueryServer interface {
 type UnimplementedUserQueryServer struct {
 }
 
+func (UnimplementedUserQueryServer) InsertUser(context.Context, *user_domain.UserCreated) (*UserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertUser not implemented")
+}
 func (UnimplementedUserQueryServer) GetByUserId(context.Context, *GetByUserIdReq) (*UserResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByUserId not implemented")
 }
@@ -70,6 +83,24 @@ type UnsafeUserQueryServer interface {
 
 func RegisterUserQueryServer(s grpc.ServiceRegistrar, srv UserQueryServer) {
 	s.RegisterService(&UserQuery_ServiceDesc, srv)
+}
+
+func _UserQuery_InsertUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(user_domain.UserCreated)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserQueryServer).InsertUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user_query.userQuery/insertUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserQueryServer).InsertUser(ctx, req.(*user_domain.UserCreated))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _UserQuery_GetByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -97,6 +128,10 @@ var UserQuery_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "user_query.userQuery",
 	HandlerType: (*UserQueryServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "insertUser",
+			Handler:    _UserQuery_InsertUser_Handler,
+		},
 		{
 			MethodName: "getByUserId",
 			Handler:    _UserQuery_GetByUserId_Handler,

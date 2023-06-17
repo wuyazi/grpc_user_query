@@ -6,6 +6,7 @@ package server
 import (
 	"context"
 
+	"github.com/wuyazi/grpc_user_domain/user_domain"
 	"github.com/wuyazi/grpc_user_query/internal/logic"
 	"github.com/wuyazi/grpc_user_query/internal/svc"
 	"github.com/wuyazi/grpc_user_query/user_query"
@@ -22,7 +23,11 @@ func NewUserQueryServer(svcCtx *svc.ServiceContext) *UserQueryServer {
 	}
 }
 
-// rpc insertUser(user_domain.UserCreated) returns(userResp);
+func (s *UserQueryServer) InsertUser(ctx context.Context, in *user_domain.UserCreated) (*user_query.UserResp, error) {
+	l := logic.NewInsertUserLogic(ctx, s.svcCtx)
+	return l.InsertUser(in)
+}
+
 func (s *UserQueryServer) GetByUserId(ctx context.Context, in *user_query.GetByUserIdReq) (*user_query.UserResp, error) {
 	l := logic.NewGetByUserIdLogic(ctx, s.svcCtx)
 	return l.GetByUserId(in)

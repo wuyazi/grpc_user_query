@@ -6,6 +6,7 @@ package userquery
 import (
 	"context"
 
+	"github.com/wuyazi/grpc_user_domain/user_domain"
 	"github.com/wuyazi/grpc_user_query/user_query"
 
 	"github.com/zeromicro/go-zero/zrpc"
@@ -14,10 +15,11 @@ import (
 
 type (
 	GetByUserIdReq = user_query.GetByUserIdReq
+	UserCreated    = user_domain.UserCreated
 	UserResp       = user_query.UserResp
 
 	UserQuery interface {
-		// rpc insertUser(user_domain.UserCreated) returns(userResp);
+		InsertUser(ctx context.Context, in *UserCreated, opts ...grpc.CallOption) (*UserResp, error)
 		GetByUserId(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error)
 	}
 
@@ -32,7 +34,11 @@ func NewUserQuery(cli zrpc.Client) UserQuery {
 	}
 }
 
-// rpc insertUser(user_domain.UserCreated) returns(userResp);
+func (m *defaultUserQuery) InsertUser(ctx context.Context, in *UserCreated, opts ...grpc.CallOption) (*UserResp, error) {
+	client := user_query.NewUserQueryClient(m.cli.Conn())
+	return client.InsertUser(ctx, in, opts...)
+}
+
 func (m *defaultUserQuery) GetByUserId(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error) {
 	client := user_query.NewUserQueryClient(m.cli.Conn())
 	return client.GetByUserId(ctx, in, opts...)

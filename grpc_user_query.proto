@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package user_query;
 option go_package="github.com/wuyazi/grpc_user_query/user_query";
-//import "github.com/wuyazi/grpc_user_domain/event.proto";
+import "github.com/wuyazi/grpc_user_domain/event.proto";
 
 message getByUserIdReq {
     int64 userId = 1;
@@ -17,6 +17,6 @@ message userResp {
 }
 
 service userQuery {
-//    rpc insertUser(user_domain.UserCreated) returns(userResp);
+    rpc insertUser(user_domain.UserCreated) returns(userResp);
     rpc getByUserId(getByUserIdReq) returns(userResp);
 }
