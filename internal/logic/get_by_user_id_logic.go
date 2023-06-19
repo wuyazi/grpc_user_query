@@ -24,7 +24,11 @@ func NewGetByUserIdLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetBy
 }
 
 func (l *GetByUserIdLogic) GetByUserId(in *user_query.GetByUserIdReq) (*user_query.UserResp, error) {
-	// todo: add your logic here and delete this line
-
-	return &user_query.UserResp{}, nil
+	ur := userRow{}
+	err := l.svcCtx.ReadDB.QueryRow(&ur, sqlGetUserByUserId, in.UserId)
+	if err != nil {
+		return nil, err
+	}
+	userResp := renderRowUserResp(ur)
+	return &userResp, nil
 }
