@@ -19,4 +19,6 @@ message userResp {
 service userQuery {
     rpc insertUser(user_domain.UserCreated) returns(userResp);
     rpc getByUserId(getByUserIdReq) returns(userResp);
+    rpc insertUserJson(user_domain.UserCreated) returns(userResp);
+    rpc getByUserIdJson(getByUserIdReq) returns(userResp);
 }

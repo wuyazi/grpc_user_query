@@ -32,3 +32,13 @@ func (s *UserQueryServer) GetByUserId(ctx context.Context, in *user_query.GetByU
 	l := logic.NewGetByUserIdLogic(ctx, s.svcCtx)
 	return l.GetByUserId(in)
 }
+
+func (s *UserQueryServer) InsertUserJson(ctx context.Context, in *user_domain.UserCreated) (*user_query.UserResp, error) {
+	l := logic.NewInsertUserJsonLogic(ctx, s.svcCtx)
+	return l.InsertUserJson(in)
+}
+
+func (s *UserQueryServer) GetByUserIdJson(ctx context.Context, in *user_query.GetByUserIdReq) (*user_query.UserResp, error) {
+	l := logic.NewGetByUserIdJsonLogic(ctx, s.svcCtx)
+	return l.GetByUserIdJson(in)
+}

@@ -25,6 +25,8 @@ const _ = grpc.SupportPackageIsVersion7
 type UserQueryClient interface {
 	InsertUser(ctx context.Context, in *user_domain.UserCreated, opts ...grpc.CallOption) (*UserResp, error)
 	GetByUserId(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error)
+	InsertUserJson(ctx context.Context, in *user_domain.UserCreated, opts ...grpc.CallOption) (*UserResp, error)
+	GetByUserIdJson(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error)
 }
 
 type userQueryClient struct {
@@ -53,12 +55,32 @@ func (c *userQueryClient) GetByUserId(ctx context.Context, in *GetByUserIdReq, o
 	return out, nil
 }
 
+func (c *userQueryClient) InsertUserJson(ctx context.Context, in *user_domain.UserCreated, opts ...grpc.CallOption) (*UserResp, error) {
+	out := new(UserResp)
+	err := c.cc.Invoke(ctx, "/user_query.userQuery/insertUserJson", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userQueryClient) GetByUserIdJson(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error) {
+	out := new(UserResp)
+	err := c.cc.Invoke(ctx, "/user_query.userQuery/getByUserIdJson", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserQueryServer is the server API for UserQuery service.
 // All implementations must embed UnimplementedUserQueryServer
 // for forward compatibility
 type UserQueryServer interface {
 	InsertUser(context.Context, *user_domain.UserCreated) (*UserResp, error)
 	GetByUserId(context.Context, *GetByUserIdReq) (*UserResp, error)
+	InsertUserJson(context.Context, *user_domain.UserCreated) (*UserResp, error)
+	GetByUserIdJson(context.Context, *GetByUserIdReq) (*UserResp, error)
 	mustEmbedUnimplementedUserQueryServer()
 }
 
@@ -71,6 +93,12 @@ func (UnimplementedUserQueryServer) InsertUser(context.Context, *user_domain.Use
 }
 func (UnimplementedUserQueryServer) GetByUserId(context.Context, *GetByUserIdReq) (*UserResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByUserId not implemented")
+}
+func (UnimplementedUserQueryServer) InsertUserJson(context.Context, *user_domain.UserCreated) (*UserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertUserJson not implemented")
+}
+func (UnimplementedUserQueryServer) GetByUserIdJson(context.Context, *GetByUserIdReq) (*UserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByUserIdJson not implemented")
 }
 func (UnimplementedUserQueryServer) mustEmbedUnimplementedUserQueryServer() {}
 
@@ -121,6 +149,42 @@ func _UserQuery_GetByUserId_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserQuery_InsertUserJson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(user_domain.UserCreated)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserQueryServer).InsertUserJson(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user_query.userQuery/insertUserJson",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserQueryServer).InsertUserJson(ctx, req.(*user_domain.UserCreated))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserQuery_GetByUserIdJson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByUserIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserQueryServer).GetByUserIdJson(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user_query.userQuery/getByUserIdJson",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserQueryServer).GetByUserIdJson(ctx, req.(*GetByUserIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserQuery_ServiceDesc is the grpc.ServiceDesc for UserQuery service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -135,6 +199,14 @@ var UserQuery_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "getByUserId",
 			Handler:    _UserQuery_GetByUserId_Handler,
+		},
+		{
+			MethodName: "insertUserJson",
+			Handler:    _UserQuery_InsertUserJson_Handler,
+		},
+		{
+			MethodName: "getByUserIdJson",
+			Handler:    _UserQuery_GetByUserIdJson_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

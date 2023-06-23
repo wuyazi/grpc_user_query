@@ -21,6 +21,8 @@ type (
 	UserQuery interface {
 		InsertUser(ctx context.Context, in *UserCreated, opts ...grpc.CallOption) (*UserResp, error)
 		GetByUserId(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error)
+		InsertUserJson(ctx context.Context, in *UserCreated, opts ...grpc.CallOption) (*UserResp, error)
+		GetByUserIdJson(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error)
 	}
 
 	defaultUserQuery struct {
@@ -42,4 +44,14 @@ func (m *defaultUserQuery) InsertUser(ctx context.Context, in *UserCreated, opts
 func (m *defaultUserQuery) GetByUserId(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error) {
 	client := user_query.NewUserQueryClient(m.cli.Conn())
 	return client.GetByUserId(ctx, in, opts...)
+}
+
+func (m *defaultUserQuery) InsertUserJson(ctx context.Context, in *UserCreated, opts ...grpc.CallOption) (*UserResp, error) {
+	client := user_query.NewUserQueryClient(m.cli.Conn())
+	return client.InsertUserJson(ctx, in, opts...)
+}
+
+func (m *defaultUserQuery) GetByUserIdJson(ctx context.Context, in *GetByUserIdReq, opts ...grpc.CallOption) (*UserResp, error) {
+	client := user_query.NewUserQueryClient(m.cli.Conn())
+	return client.GetByUserIdJson(ctx, in, opts...)
 }
